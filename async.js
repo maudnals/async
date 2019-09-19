@@ -44,32 +44,44 @@ simplePromise
 // Promise API:
 // --------------------
 
-// resolve, reject:
-// Usage 1: see example above when they're referred to from within the executor.
-// Usage 2: "2 in 1 effect" = create+returns a new promise (that resolves with the given value). "Generally, if you don't know if a value is a promise or not, Promise.resolve(value) it instead. And work with the return value as a promise." Useful to create the return value of an async function. For example when the return value depends on conditions, one of them is async and the other is not really, but we want the result of an async function to be THENABLE in both cases.
+// resolve and reject (called with a VALUE as arg):
+// --------------------
+
+// Usage 1: See example above when they're used within the executor.
+// Usage 2: "Promise.resolve(value) for 2-in-1 effect". Creates+returns a new promise (that resolves with the given value). "Generally, if you don't know if a value is a promise or not, Promise.resolve(value) it instead. And work with the return value as a promise." Useful to create the return value of an async function. For example when the return value depends on conditions, one of them is async and the other is not really, but we want the result of an async function to be THENABLE in both cases.
 // Example:
 
 const promiseCreator = () => Promise.resolve("foo2");
 console.log("promiseCreator", promiseCreator());
 promiseCreator().then(value => console.log("value:", value));
 
-// public async verify(): Promise<boolean> {
-//     if (!this.verifyData()) {
-//      // create+returns a new promise, that resolves with the given value (=false)
-//         return Promise.resolve(false);
-//       }
-//       return this.attestation.verify()
-// }
+// --------------------
+// all and race (called with an ITERABLE as arg):
 
-// console.log(promise1.resolve);
+const p1 = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    resolve("p1");
+  }, 100);
+});
+const p2 = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    resolve("p2");
+  }, 200);
+});
 
-// race, all
+// all and race are very similar BUT for the argument of the callback: array vs. single value (values vs value).
+// don't forget the then of course!!
+Promise.all([p1, p2]).then(values => values.map(v => console.log(v)));
+Promise.race([p1, p2]).then(value => console.log(value));
+
+// --------------------
 // catch, then, finally ----- return a new Promise
-// ----
-// how to create a new promise
-// how to get the result of a promise
 
-// / Link between promise and async???
+// Create a new promise? x = new Promise((resolve, reject) => { settimeout(resolve("hi"), 2000)})
+// Get the result of a promise?
+
+// Link between promise and async???
+// main diffs between promise and async aka one is not cancellable
 
 // Main promise methods:
 
@@ -125,5 +137,3 @@ promiseCreator().then(value => console.log("value:", value));
 // https://javascript.info/async-await
 // 999
 // can you do &&?
-
-// main diffs between promise and async aka one is not cancellable
